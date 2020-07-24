@@ -1,25 +1,29 @@
 #include <iostream>
-#include <string>
-#include <cstdlib>
 #include <list>
 #include <sys/stat.h>
 #include <memory>
-struct ListNode 
+#include <cmath>
+#include <cfloat>
+#include <stack>
+#include <stdio.h>
+
+struct ListNode
 {
-	ListNode * prev;
-	ListNode * next;
-	ListNode * rand;
+	ListNode *prev;
+	ListNode *next;
+	ListNode *rand;
 	std::string data;
 };
 
-class List 
+// Task 1
+class List
 {
 public:
 	void SetCount(const int count)
 	{
 		this->count = count;
 	}
-	
+
 	void InsertStruct()
 	{
 		ListNode strNode;
@@ -32,10 +36,10 @@ public:
 		for (long i = 0; i < count; ++i)
 		{
 			strNode.prev = &list.back();
-			strNode.data = "data " + std::to_string(i+1);
+			strNode.data = "data " + std::to_string(i + 1);
 			strNode.next = NULL;
 
-			// Рандомный элемент
+			// Р Р°РЅРґРѕРјРЅС‹Р№ СѓРєР°Р·Р°С‚РµР»СЊ
 			if (i == 4)
 			{
 				auto itt = list.begin();
@@ -52,10 +56,10 @@ public:
 		}
 	}
 
-	void Serialize(FILE * file) 
+	void Serialize(FILE *file)
 	{
 		std::string emptyStr("0\n");
-		const char* EndStr = "\n";
+		const char *EndStr = "\n";
 		for (auto &itt : list)
 		{
 			fwrite(itt.data.c_str(), itt.data.size(), sizeof(char), file);
@@ -88,120 +92,116 @@ public:
 		fclose(file);
 	}
 
-	void Deserialize(FILE * file) 
+	void Deserialize(FILE *file)
 	{
-		// Определили размер
 		struct stat fi;
 		stat("text.txt", &fi);
-		fi.st_size;
-		char* data = new char[fi.st_size];
 
-		// Считали файл
-		fread(data, sizeof(char), fi.st_size, file);
-
-		char* pos(nullptr);
-		pos = data;
-		char* cursor(nullptr);
-		cursor = data;
-
-		// Сдвиг по файлу
-		auto shift = [&]()
+		char *data = new char[fi.st_size];
+		if (data)
 		{
-			cursor = pos + 1;
-			pos = strstr(cursor, "\n");
-		};
 
-		ListNode strNew;
-		std::string strForSearch;
-		std::string strForSearchNext;
-		std::string strForRemberNextStruct;
-		long iShift(0);
+			fread(data, sizeof(char), fi.st_size, file);
 
-		while (pos != NULL || (cursor - data) >= fi.st_size)
-		{
-			// ListNode data заполняем;
-			//***************************	
-			pos = strstr(cursor, "\n");
-			if (!pos)
-				break;
+			char *pos(nullptr);
+			pos = data;
+			char *cursor(nullptr);
+			cursor = data;
 
-			strNew.data.resize((pos - cursor));
-			memcpy_s(&strNew.data[0], (pos - cursor) * sizeof(char), cursor, (pos - cursor) * sizeof(char));
-			//***************************
+			auto shift = [&]() {
+				cursor = pos + 1;
+				pos = strstr(cursor, "\n");
+			};
 
-			// ListNode * next заполняем;
-			//***************************
-			shift();
-			if (!pos)
-				break;
+			ListNode strNew;
+			std::string strForSearch;
+			std::string strForSearchNext;
+			std::string strForRemberNextStruct;
+			long iShift(0);
 
-			strForSearchNext.resize((pos - cursor));
-			memcpy_s(&strForSearchNext[0], (pos - cursor) * sizeof(char), cursor, (pos - cursor) * sizeof(char));
-
-			if (strForSearchNext == "0")
-				strNew.next = NULL;
-			else if (strForRemberNextStruct.empty())
-				strForRemberNextStruct = strForSearchNext;// Заполним позже
-			//***************************
-
-			// ListNode * prev заполняем;
-			//***************************
-			shift();
-			if (!pos)
-				break;
-
-			strForSearch.resize((pos - cursor));
-			memcpy_s(&strForSearch[0], (pos - cursor) * sizeof(char), cursor, (pos - cursor) * sizeof(char));
-			if (strForSearch == "0")
-				strNew.prev = NULL;
-			else if (strForSearch == ListStrNew.back().data)
-				strNew.prev = &ListStrNew.back();
-			//***************************
-
-			// ListNode * rand заполняем;
-			//***************************
-			shift();
-			if (!pos)
-				break;
-
-			strForSearch.resize((pos - cursor));
-			memcpy_s(&strForSearch[0], (pos - cursor) * sizeof(char), cursor, (pos - cursor) * sizeof(char));
-			if (strForSearch == "0")
-				strNew.rand = NULL;
-			else
+			while (pos != NULL || (cursor - data) >= fi.st_size)
 			{
-				for (auto &itt : ListStrNew)
+				//***************************
+				pos = strstr(cursor, "\n");
+				if (!pos)
+					break;
+
+				strNew.data.resize((pos - cursor));
+				memcpy(&strNew.data[0], cursor, (pos - cursor) * sizeof(char));
+				//***************************
+
+				//***************************
+				shift();
+				if (!pos)
+					break;
+
+				strForSearchNext.resize((pos - cursor));
+				memcpy(&strForSearchNext[0], cursor, (pos - cursor) * sizeof(char));
+
+				if (strForSearchNext == "0")
+					strNew.next = NULL;
+				else if (strForRemberNextStruct.empty())
+					strForRemberNextStruct = strForSearchNext;
+				//***************************
+
+				//***************************
+				shift();
+				if (!pos)
+					break;
+
+				strForSearch.resize((pos - cursor));
+				memcpy(&strForSearch[0], cursor, (pos - cursor) * sizeof(char));
+				if (strForSearch == "0")
+					strNew.prev = NULL;
+				else if (strForSearch == ListStrNew.back().data)
+					strNew.prev = &ListStrNew.back();
+				//***************************
+
+				// ListNode * rand пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ;
+				//***************************
+				shift();
+				if (!pos)
+					break;
+
+				strForSearch.resize((pos - cursor));
+				memcpy(&strForSearch[0], cursor, (pos - cursor) * sizeof(char));
+				if (strForSearch == "0")
+					strNew.rand = NULL;
+				else
 				{
-					if (strForSearch == itt.data)
-						strNew.rand = &itt;
+					for (auto &itt : ListStrNew)
+					{
+						if (strForSearch == itt.data)
+							strNew.rand = &itt;
+					}
 				}
-			}
-			//***************************
-			ListStrNew.push_back(strNew);
+				//***************************
+				ListStrNew.push_back(strNew);
 
-			// Вернулись, чтобы next, предыдущей итерации ссылался на текущую
-			if (strNew.data == strForRemberNextStruct)
-			{
-				auto itt = ListStrNew.begin();
-				std::advance(itt, iShift);
-				itt->next = &ListStrNew.back();
-				strForRemberNextStruct = strForSearchNext;
-				++iShift;
+				if (strNew.data == strForRemberNextStruct)
+				{
+					auto itt = ListStrNew.begin();
+					std::advance(itt, iShift);
+					itt->next = &ListStrNew.back();
+					strForRemberNextStruct = strForSearchNext;
+					++iShift;
+				}
+				cursor = pos + 1;
 			}
-			cursor = pos + 1;
+
+			fclose(file);
+			delete[] data;
+			data = nullptr;
 		}
-
-		fclose(file);
-		delete[] data;
-		data = nullptr;
 	}
+
 private:
 	std::list<ListNode> ListStrNew;
 	std::list<ListNode> list;
 	int count;
 };
 
-
+// Task 2
 void ConvertToBin(long num)
 {
 	bool m_bCountNegative(false);
@@ -220,36 +220,40 @@ void ConvertToBin(long num)
 	long x = (long)trunc(log2(num)) + 1;
 	x = m_bCountNegative ? x + 1 : x;
 
-	char* ret = new char[x + 1];
-	ret[x] = '\0';
-
-	while (num != 0)
+	char *ret = new char[x + 1];
+	if (ret)
 	{
-		if (x < 0)
-			break;
+		ret[x] = '\0';
 
-		if (num % 2 == 1)
-			ret[x - 1] = '1';
-		else
-			ret[x - 1] = '0';
+		while (num != 0)
+		{
+			if (x < 0)
+				break;
 
-		--x;
-		num /= 2;
+			if (num % 2 == 1)
+				ret[x - 1] = '1';
+			else
+				ret[x - 1] = '0';
+
+			--x;
+			num /= 2;
+		}
+
+		if (m_bCountNegative)
+			ret[0] = '-';
+
+		//printf("%s", ret);
+		std::cout << "Output integer Number: " << ret;
+
+		delete[] ret;
+		ret = nullptr;
 	}
-
-	if (m_bCountNegative)
-		ret[0] = '-';
-
-	//printf("%s", ret);
-	std::cout << "Output integer Number: " << ret;
-
-	delete[] ret;
-	ret = nullptr;
-
 	return;
 }
+// ***
 
-void RemoveDups(char* str)
+// Task 3
+void RemoveDups(char *str)
 {
 	for (long i = 1; i < (long)strlen(str); ++i)
 	{
@@ -260,6 +264,131 @@ void RemoveDups(char* str)
 		}
 	}
 	//printf("%s", str);
+}
+// ***
+
+// Task 4
+struct list
+{
+	struct list *next = nullptr;
+};
+
+void funcReverse(list *_l)
+{
+	if (_l == nullptr)
+		return;
+
+	struct list *curElement = _l, *nextElement = nullptr, *prevElement = nullptr;
+
+	while (curElement)
+	{
+		nextElement = curElement->next;
+		curElement->next = prevElement;
+		prevElement = curElement;
+		curElement = nextElement;
+	}
+}
+//****
+
+// Task 5
+void findMissNum(int *arr, int size)
+{
+	if (arr == nullptr || size <= 0)
+		return;
+
+	// РЎСѓРјРјР°/РїСЂРѕРёР·РІРµРґРµРЅРёРµ РјР°СЃСЃРёРІР°
+	double sum = 0;
+	double multi = 1;
+
+	// РЎСѓРјРјР°/РїСЂРѕРёР·РІРµРґРµРЅРёРµ С‡РёСЃРµР» РѕС‚ 0 РґРѕ n
+	double countSum = (size + 1) * ((size + 1) + 1) / 2;
+	double countMulti = 1;
+
+	for (long i = 1; i <= size + 1; ++i)
+		countMulti = countMulti * i;
+
+	for (long i = 0; i < size; ++i)
+		sum += arr[i];
+
+	bool bflag = false;
+	for (long i = 0; i < size; ++i)
+	{
+		if (arr[i] < 0)
+		{
+			bflag = true;
+			break;
+		}
+
+		if (arr[i] != 0)
+			multi *= arr[i];
+	}
+
+	if (bflag)
+		return;
+
+	countSum -= sum;
+	countMulti /= multi;
+
+	double diff = sqrt(pow(countSum, 2) - 4 * (countMulti));
+
+	// РїРµСЂРІРѕРµ РїСЂРѕРїСѓС‰РµРЅРЅРѕРµ
+	if (std::isnan(diff)) // Р”РѕР±Р°РІРёР» РїСЂРѕРІРµСЂРєСѓ РЅР° size=1
+		diff = 0;
+	else
+		diff = (countSum + diff) / 2;
+	// РІС‚РѕСЂРѕРµ РїСЂРѕРїСѓС‰РµРЅРЅРѕРµ
+	countSum = countSum - diff;
+}
+//***
+
+// Task 6
+bool CorrectFunc(const char *str)
+{
+	if (str == nullptr)
+		return false;
+
+	bool ret(true);
+
+	long left = 0, right = strlen(str);
+
+	std::stack<char> sSymbol;
+
+	while (left < right)
+	{
+		switch (str[left])
+		{
+		case '{':
+			sSymbol.push('{');
+			break;
+		case '(':
+			sSymbol.push('(');
+			break;
+		case '}':
+			if (sSymbol.empty() || sSymbol.top() != '{')
+				ret = false;
+			else
+				sSymbol.pop();
+			break;
+		case ')':
+			if (sSymbol.empty() || sSymbol.top() != '(')
+				ret = false;
+			else
+				sSymbol.pop();
+			break;
+		default:
+			break;
+		}
+
+		if (!ret)
+			break;
+
+		++left;
+	}
+
+	if (sSymbol.empty() && ret)
+		return true;
+	else
+		return false;
 }
 
 int main()
@@ -272,25 +401,45 @@ int main()
 
 	std::cout << "\nTask2 Input String: ";
 	getline(std::cin, strtmp);
-	char* str = const_cast<char*>(strtmp.c_str());
+	char *str = const_cast<char *>(strtmp.c_str());
 	RemoveDups(str);
 	std::cout << "Output String: " << str;
 	std::cout << "\n";
 
-	std::unique_ptr <List> Clist(new List);
-	Clist->SetCount(8);
-	Clist->InsertStruct();
+	std::unique_ptr<List> Clist(new List);
+	if (Clist)
+	{
+		Clist->SetCount(8);
+		Clist->InsertStruct();
+	}
 
-	FILE * file(nullptr);
-	// Сериализация
-	fopen_s(&file, "text.txt", "wb");
-	Clist->Serialize(file);
+	FILE *file(nullptr);
+	if (file)
+	{
+		file = fopen("text.txt", "wb");
+		Clist->Serialize(file);
 
-	// Десериализация
-	fopen_s(&file, "text.txt", "rb");
-	Clist->Deserialize(file);
+		file = fopen("text.txt", "rb");
+		Clist->Deserialize(file);
+		file = nullptr;
+	}
 
-	file = nullptr;
+	// Task4
+	list node[10];
+	int size = sizeof(node) / sizeof(list);
+
+	for (long i = size - 2; i >= 0; --i)
+		node[i].next = &node[i + 1];
+
+	funcReverse(node);
+
+	// Task5
+	int arr[9] = {0, 1, 2, 3, 5, 6, 7, 8, 9};
+	findMissNum(arr, 9);
+
+	// Task6
+	const char *Str = "hello (7*9) * {ss()} ";
+	std::cout << CorrectFunc(Str) << std::endl;
 
 	system("pause");
 	return 0;
